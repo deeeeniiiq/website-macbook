@@ -1,0 +1,7 @@
+'use strict';
+window.DROPMAC_DECISION=function(products,input){
+const {budget,monthly,patience,priority}=input;if(![budget,monthly,patience].every(Number.isFinite)||budget<0||monthly<0||patience<0||!['balanced','lowest','silicon'].includes(priority))throw Error('Valores inválidos');
+const all=Object.entries(products).filter(([id,m])=>Number.isFinite(m.price)&&m.price>0&&Number.isFinite(m.multi)&&m.multi>0).map(([id,m])=>({...m,id,efficiency:m.multi/m.price})).sort((a,b)=>a.price-b.price);
+const rank=list=>list.slice().sort((a,b)=>priority==='lowest'?a.price-b.price:priority==='silicon'?Number(b.id==='m1'||b.id==='m2')-Number(a.id==='m1'||a.id==='m2')||b.efficiency-a.efficiency:b.efficiency-a.efficiency)[0]||null;
+const now=rank(all.filter(m=>m.price<=budget));const upgrades=all.filter(m=>m.price>budget&&(!now||m.multi>now.multi));let wait=rank(upgrades.filter(m=>m.price<=budget+monthly*patience));if(!wait)wait=rank(upgrades);const missing=wait?Math.max(0,wait.price-budget):0;const months=missing===0?0:monthly>0?Math.ceil(missing/monthly):null;const withinDeadline=!!wait&&months!==null&&months<=patience;const improved=!!wait&&(!now||wait.efficiency>now.efficiency);const shouldWait=!!wait&&withinDeadline&&(priority!=='lowest'||!now)&&improved;const target=shouldWait?wait:now||wait;return {now,wait,target,missing,months,withinDeadline,kind:now?(shouldWait?'wait':'now'):'save',gain:now&&wait?(wait.multi/now.multi-1)*100:null,budget,monthly,patience,priority};
+};

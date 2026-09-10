@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+node_modules/
+.openai/
+.codex/
+work/
+*.log
+.DS_Store
+Thumbs.db
