@@ -1,8 +1,16 @@
 (function(){'use strict';const key='dropmac-theme';const media=window.matchMedia('(prefers-color-scheme: dark)');let saved=null;try{saved=localStorage.getItem(key);}catch{}let current=saved==='light'||saved==='dark'?saved:media.matches?'dark':'light';function apply(theme){current=theme;document.documentElement.dataset.theme=theme;document.documentElement.style.colorScheme=theme;const b=document.getElementById('theme-toggle');if(b){b.setAttribute('aria-pressed',String(theme==='dark'));b.setAttribute('aria-label',theme==='dark'?'Ativar tema claro':'Ativar tema escuro');const label=document.getElementById('theme-label');if(label)label.textContent=theme==='dark'?'Claro':'Escuro';}}apply(current);function setup(){apply(current);document.getElementById('theme-toggle')?.addEventListener('click',()=>{saved=current==='dark'?'light':'dark';apply(saved);try{localStorage.setItem(key,saved);}catch{}});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();media.addEventListener?.('change',event=>{if(saved!=='light'&&saved!=='dark')apply(event.matches?'dark':'light');});})();
 
 (function(){'use strict';
-  function addStyle(href,id){if(document.getElementById(id))return;const link=document.createElement('link');link.id=id;link.rel='stylesheet';link.href=href;const base=document.querySelector('link[href="style.css"]');if(base)base.insertAdjacentElement('afterend',link);else document.head.append(link);}
+  function addStyle(href,id){if(document.getElementById(id))return;const link=document.createElement('link');link.id=id;link.rel='stylesheet';link.href=href;document.head.append(link);}
   function loadScript(src,id){return new Promise((resolve,reject)=>{const existing=document.getElementById(id);if(existing){if(existing.dataset.loaded==='true')resolve();else existing.addEventListener('load',resolve,{once:true});return;}const script=document.createElement('script');script.id=id;script.src=src;script.defer=true;script.onload=()=>{script.dataset.loaded='true';resolve();};script.onerror=reject;document.body.append(script);});}
-  async function boot(){addStyle('drop-v2.css','dropmac-v2-style');try{await loadScript('drop-data.js','dropmac-drop-data');await loadScript('drop-v2.js','dropmac-v2-script');}catch(error){console.error('Dropmac V2 não pôde ser carregado.',error);}}
+  async function boot(){
+    addStyle('drop-v2.css','dropmac-v2-style');
+    addStyle('drop-v3.css','dropmac-v3-style');
+    try{
+      await loadScript('drop-data.js','dropmac-drop-data');
+      await loadScript('drop-v2.js','dropmac-v2-script');
+      await loadScript('drop-v3.js','dropmac-v3-script');
+    }catch(error){console.error('A experiência Dropmac não pôde ser carregada.',error);}
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
